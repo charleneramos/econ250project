@@ -1,0 +1,198 @@
+install.packages('kableExtra')
+install.packages('tidyverse')
+install.packages('webshot2')
+
+library(kableExtra)
+library(tidyverse)
+library(webshot2)
+ 
+setwd('/Users/charleneramos/Library/CloudStorage/OneDrive-UCSanDiego/Documents/UC San Diego/02. Coursework/e. Programming/250A (FA25)/03. VSP')
+
+level_1a <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/level_1a.csv')
+# locations <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/locations.csv')
+# projects <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/projects.csv')
+transactions <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/transactions.csv')
+
+df <- transactions %>%
+  filter(transaction_value_code == 'D') %>% # filter for disbursement
+  select(-c('transaction_isodate', 'transaction_currency','transaction_value_code')) # drop unnecessary columns; note USD currency
+
+df <- merge(df, level_1a, by = 'project_id')
+# df <- merge(df, projects, by = 'project_id')
+# df <- merge(df, locations, by = 'project_id')
+
+df <- df %>%
+  filter(transactions_end_year >= 2013 & transactions_end_year <= 2017) %>% # filter for years 2013-2017
+  filter(location_type_code == 'ADM2') %>% # filter for ADM2 locations
+  distinct() %>% 
+  arrange(project_id) %>% 
+  select(c('project_id', 'project_location_id', everything()))
+
+all_transaction <- df %>% 
+  group_by(transactions_end_year) %>%
+  summarise(
+    mean = mean(transaction_value),
+    sd = sd(transaction_value),
+    n = n(), 
+    min = min(transaction_value), 
+    max = max(transaction_value)
+  ) %>% 
+  mutate(region = 'All', variable = 'transaction') %>% 
+  rename(year = transactions_end_year) %>%
+  select(c('variable','region'), everything())
+
+all_total_disbursement<- df %>% 
+  group_by(transactions_end_year) %>%
+  summarise(
+    mean = mean(total_disbursements),
+    sd = sd(total_disbursements),
+    n = n(), 
+    min = min(total_disbursements), 
+    max = max(total_disbursements)
+  ) %>% 
+  mutate(region = 'All', variable = 'total_disbursement') %>% 
+  rename(year = transactions_end_year) %>%
+  select(c('variable','region'), everything())
+
+all_even_disbursement<- df %>% 
+  group_by(transactions_end_year) %>%
+  summarise(
+    mean = mean(even_split_disbursements),
+    sd = sd(even_split_disbursements),
+    n = n(), 
+    min = min(even_split_disbursements), 
+    max = max(even_split_disbursements)
+  ) %>% 
+  mutate(region = 'All', variable = 'even_split_disbursement') %>% 
+  rename(year = transactions_end_year) %>%
+  select(c('variable','region'), everything())
+
+region_transaction <- df %>% 
+  group_by(transactions_end_year, place_name) %>%
+  summarise(
+    mean = mean(transaction_value),
+    sd = sd(transaction_value),
+    n = n(), 
+    min = min(transaction_value), 
+    max = max(transaction_value)
+  ) %>% 
+  mutate(variable = 'transaction') %>% 
+  rename(region = place_name, year = transactions_end_year) %>%
+  select(c('variable','region'), everything()) %>% 
+  arrange(region)
+
+region_total_disbursement <- df %>% 
+  group_by(transactions_end_year, place_name) %>%
+  summarise(
+    mean = mean(total_disbursements),
+    sd = sd(total_disbursements),
+    n = n(), 
+    min = min(total_disbursements), 
+    max = max(total_disbursements)
+  ) %>% 
+  mutate(variable = 'total_disbursement') %>% 
+  rename(region = place_name, year = transactions_end_year) %>%
+  select(c('variable','region'), everything()) %>% 
+  arrange(region)
+
+region_even_disbursement <- df %>% 
+  group_by(transactions_end_year, place_name) %>%
+  summarise(
+    mean = mean(even_split_disbursements),
+    sd = sd(even_split_disbursements),
+    n = n(), 
+    min = min(even_split_disbursements), 
+    max = max(even_split_disbursements)
+  ) %>% 
+  mutate(variable = 'even_split_disbursement') %>% 
+  rename(region = place_name, year = transactions_end_year) %>%
+  select(c('variable','region'), everything()) %>% 
+  arrange(region)
+
+df_stats <- bind_rows(all_transaction, all_total_disbursement, all_even_disbursement, region_transaction, region_total_disbursement, region_even_disbursement)
+
+df_stats <- df_stats %>% 
+  arrange(variable)
+
+write_csv(df_stats, 'data/int/summary_stats_aid.csv')
+
+df_sum_stat <- df_stats %>%
+  mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
+  mutate(year = as.numeric(gsub(',', '', year))) %>%
+  filter(region == 'All') %>%
+  kbl() %>%                       # <— kableExtra’s wrapper; detects format
+  kable_styling(full_width = FALSE)
+
+save_kable(df_sum_stat, 'output/summary_stats_aid.html')
+webshot('output/summary_stats_aid.html', 'output/summary_stats_aid.png',
+        selector = "table",      # crops tightly to the table
+        zoom = 2,                # higher resolution
+        vwidth = 2000,           # width of the browser window
+        vheight = 3000           # height — increase if your table is tall
+)
+
+df_stat_mean <- df_stats %>% 
+  group_by(variable, region, year) %>%
+  mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
+  mutate(year = as.numeric(gsub(',', '', year))) %>% 
+  select(c('variable', 'region', 'year', 'mean', 'sd')) %>%
+  filter(region == 'All') %>%
+  mutate(
+    # format each mean–sd pair as a string
+    mean_sd = paste0(
+      mean,
+      "<br>(",
+      sd,
+      ")"
+    )
+  ) %>%
+  select(variable, region, year, mean_sd) %>%
+  pivot_wider(
+    names_from  = year,
+    values_from = mean_sd
+  ) %>%
+  select(c('variable', 'region', '2013', '2014', '2015', '2016', '2017')) %>%
+  kbl(escape = FALSE, align = "lcccc", caption = "Mean (SD) by Year") %>%
+  kable_styling(full_width = FALSE) 
+
+save_kable(df_stat_mean, 'output/summary_mean_aid.html')
+webshot('output/summary_mean_aid.html', 'output/summary_mean_aid.png', 
+        selector = "table",      # crops tightly to the table
+        zoom = 2,                # higher resolution
+        vwidth = 2000,           # width of the browser window
+        vheight = 3000           # height — increase if your table is tall
+)
+
+
+df_stat_mean_region <- df_stats %>% 
+  group_by(region, year) %>%
+  mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
+  mutate(year = as.numeric(gsub(',', '', year))) %>% 
+  filter(variable == 'even_split_disbursement') %>%
+  select(c('region', 'year', 'mean', 'sd')) %>%
+  mutate(
+    # format each mean–sd pair as a string
+    mean_sd = paste0(
+      mean,
+      "<br>(",
+      sd,
+      ")"
+    )
+  ) %>%
+  select(region, year, mean_sd) %>%
+  pivot_wider(
+    names_from  = year,
+    values_from = mean_sd
+  ) %>%
+  select(c('region', '2013', '2014', '2015', '2016', '2017')) %>%
+  kbl(escape = FALSE, align = "lcccc", caption = "Mean (SD) by Year and Region") %>%
+  kable_styling(full_width = FALSE) 
+
+save_kable(df_stat_mean_region, 'output/summary_mean_aid_region.html')
+webshot('output/summary_mean_aid_region.html', 'output/summary_mean_aid_region.png', 
+        selector = "table",      # crops tightly to the table
+        zoom = 2,                # higher resolution
+        vwidth = 2000,           # width of the browser window
+        vheight = 3000           # height — increase if your table is tall
+)
+
