@@ -1,6 +1,4 @@
-install.packages('kableExtra')
-install.packages('tidyverse')
-install.packages('webshot2')
+install.packages(c('kableExtra','knitr','rmarkdown','tidyverse','tinytex','webshot2'))
 
 library(kableExtra)
 library(tidyverse)
