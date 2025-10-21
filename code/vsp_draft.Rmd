@@ -1,17 +1,32 @@
 
 ---
+title: "Does Foreign Aid Improve Educational Outcomes? Evidence from Uganda"
+author: 
+  - Riana Ramonjamanana
+  - Charlene R. Ramos
+date: "`r Sys.Date()`"
+
 output: 
   pdf_document:
     latex_engine: xelatex
+    number_sections: true
+    keep_tex: false
 
 header-includes:
   - \usepackage{amsmath, amssymb}
   - \usepackage{booktabs}
   - \usepackage{caption}      
+  - \usepackage{float}
   - \usepackage{geometry}    
-  - \usepackage{lmodern}      
+  - \usepackage{lmodern}     
+  - \usepackage{placeins} 
   - \usepackage{setspace}    
   - \usepackage{threeparttable}
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhf{} % clear default header/footer
+  - \cfoot{\thepage} % page number on bottom-right
+  - \renewcommand{\headrulewidth}{0pt}
 ---
 
 ```{r setup, include=FALSE}
@@ -224,13 +239,25 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 #         vwidth = 2000,           # width of the browser window
 #         vheight = 3000           # height — increase if your table is tall
 # )
-# 
+
 ```
 
 
 
 
 ```{=latex}
+
+
+
+\section{Introduction}
+In this paper, we study the impact of foreign aid on the educational outcomes of working-age adults in Uganda. The relationship between the amount of aid received and the economic growth of developing countries remains an open, important question among researchers and policymakers. Using spatial data from William \& Mary’s GeoQuery platform, we trace the geographic boundaries of various projects and their reach during 2014 to 2017. This allows us to pursue identification through a Barthik instrument constructed with industry and employment shares by district. To formulate the second stage of the regression, we utilize data on educational attainment available at the smallest level of disaggregation for interpretation against the instrumental variable.
+
+\section{Data}
+The project, locations, and transactions provided in the foreign aid dataset was extracted using the GeoQuery platform, which was initially funded by USAID and continues to be managed by William \& Mary as an initiative under their development research lab called AidData. The combined dataset contains all geocoded projects from the Government of Uganda's Aid Information Management System (AIMS) (also known as Uganda's Aid Management Platform or UAMP). It follows 565 geocoded projects across 2,426 locations from as early as the late 1970s through the mid-2010s. In total, the database accounts for more than \$$7.5$ billion in disbursements. The scope of the projects span a wide range of targeted sectors such as health, energy, and education with additional detailed information on other relevant variables including donors, start date, end date, and total commitments. 
+
+\section{Methodology}
+\section{Results}
+
 \begin{table}[!htbp]
 \centering
 \caption{Summary Statistics by Year}
@@ -290,11 +317,26 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
+\FloatBarrier
+
+\section{Discussion}
+\section{Conclusion}
+\section{References}
+
+
+
+
 ```
 
 ```{r render, include=FALSE, eval=FALSE}
 rmarkdown::render(
   "/Users/charleneramos/Documents/Git/econ250project/code/table_means.Rmd",
+  output_format = "pdf_document",
+  output_dir = "/Users/charleneramos/Documents/Git/econ250project/output/"
+)
+
+rmarkdown::render(
+  "/Users/charleneramos/Documents/Git/econ250project/code/vsp_draft.Rmd",
   output_format = "pdf_document",
   output_dir = "/Users/charleneramos/Documents/Git/econ250project/output/"
 )
