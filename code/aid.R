@@ -1,16 +1,24 @@
-install.packages(c('kableExtra','knitr','rmarkdown','tidyverse','tinytex','webshot2'))
+rm(list = ls())
 
+
+
+# ---- load packages ----
+library(here)
 library(kableExtra)
 library(tidyverse)
 library(webshot2)
- 
-setwd('/Users/charleneramos/Library/CloudStorage/OneDrive-UCSanDiego/Documents/UC San Diego/02. Coursework/e. Programming/250A (FA25)/03. VSP')
 
+
+
+# ---- import data ----
 level_1a <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/level_1a.csv')
 # locations <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/locations.csv')
 # projects <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/projects.csv')
 transactions <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/transactions.csv')
 
+
+
+# ---- clean up data ----
 df <- transactions %>%
   filter(transaction_value_code == 'D') %>% # filter for disbursement
   select(-c('transaction_isodate', 'transaction_currency','transaction_value_code')) # drop unnecessary columns; note USD currency
@@ -112,7 +120,10 @@ df_stats <- bind_rows(all_transaction, all_total_disbursement, all_even_disburse
 df_stats <- df_stats %>% 
   arrange(variable)
 
-write_csv(df_stats, 'data/int/summary_stats_aid.csv')
+
+
+# ---- create summary statistics ----
+write_csv(df_stats, 'data/final/summary_stats_aid.csv')
 
 df_sum_stat <- df_stats %>%
   mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
@@ -160,7 +171,6 @@ webshot('output/summary_mean_aid.html', 'output/summary_mean_aid.png',
         vwidth = 2000,           # width of the browser window
         vheight = 3000           # height — increase if your table is tall
 )
-
 
 df_stat_mean_region <- df_stats %>% 
   group_by(region, year) %>%
