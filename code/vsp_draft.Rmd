@@ -10,7 +10,7 @@ output:
   pdf_document:
     latex_engine: xelatex
     number_sections: true
-    keep_tex: false
+    keep_tex: true
 
 header-includes:
   - \usepackage{amsmath, amssymb}
@@ -31,214 +31,22 @@ header-includes:
 
 ```{r setup, include=FALSE}
 # install.packages(c("kableExtra","knitr","rmarkdown","tidyverse","tinytex","webshot2"))
-# tinytex::install_tinytex() 
+# tinytex::install_tinytex()
 
 # ------------------------------- INSTRUCTIONS ------------------------------- #
-# 1. Uncomment R chunk labeled data_aid. This cleans and analyzes the 
-# international aid data. When finish, comment this chunk out again. The PDF 
-# file won't render otherwise. 
+# 1. Uncomment R chunk labeled data_aid. This cleans and analyzes the
+# international aid data. When finish, comment this chunk out again. The PDF
+# file won't render otherwise.
 # 2. Run R chunk labeled render to generate the PDF table.
 
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
 ```{r data_aid, include=FALSE}
-# 
-# library(kableExtra)
-# library(tidyverse)
-# library(webshot2)
-# 
-# # setwd('/Users/charleneramos/Documents/Git/econ250project')
-# 
-# # fmt <- function(x) formatC(x, format = "f", big.mark = ",", digits = 0)
-# 
-# level_1a <- read_csv('/Users/charleneramos/Documents/Git/econ250project/data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/level_1a.csv')
-# # locations <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/locations.csv')
-# # projects <- read_csv('data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/projects.csv')
-# transactions <- read_csv('/Users/charleneramos/Documents/Git/econ250project/data/raw/UgandaAIMS_GeocodedResearchRelease_Level1_v1.4.1/data/transactions.csv')
-# 
-# df <- transactions %>%
-#   filter(transaction_value_code == 'D') %>% # filter for disbursement
-#   select(-c('transaction_isodate', 'transaction_currency','transaction_value_code')) # drop unnecessary columns; note USD currency
-# 
-# df <- merge(df, level_1a, by = 'project_id')
-# # df <- merge(df, projects, by = 'project_id')
-# # df <- merge(df, locations, by = 'project_id')
-# 
-# df <- df %>%
-#   filter(transactions_end_year >= 2013 & transactions_end_year <= 2017) %>% # filter for years 2013-2017
-#   filter(location_type_code == 'ADM2') %>% # filter for ADM2 locations
-#   distinct() %>%
-#   arrange(project_id) %>%
-#   select(c('project_id', 'project_location_id', everything()))
-# 
-# all_transaction <- df %>%
-#   group_by(transactions_end_year) %>%
-#   summarise(
-#     mean = mean(transaction_value),
-#     sd = sd(transaction_value),
-#     n = n(),
-#     min = min(transaction_value),
-#     max = max(transaction_value)
-#   ) %>%
-#   mutate(region = 'All', variable = 'transaction') %>%
-#   rename(year = transactions_end_year) %>%
-#   select(c('variable','region'), everything())
-# 
-# all_total_disbursement<- df %>%
-#   group_by(transactions_end_year) %>%
-#   summarise(
-#     mean = mean(total_disbursements),
-#     sd = sd(total_disbursements),
-#     n = n(),
-#     min = min(total_disbursements),
-#     max = max(total_disbursements)
-#   ) %>%
-#   mutate(region = 'All', variable = 'total_disbursement') %>%
-#   rename(year = transactions_end_year) %>%
-#   select(c('variable','region'), everything())
-# 
-# all_even_disbursement<- df %>%
-#   group_by(transactions_end_year) %>%
-#   summarise(
-#     mean = mean(even_split_disbursements),
-#     sd = sd(even_split_disbursements),
-#     n = n(),
-#     min = min(even_split_disbursements),
-#     max = max(even_split_disbursements)
-#   ) %>%
-#   mutate(region = 'All', variable = 'even_split_disbursement') %>%
-#   rename(year = transactions_end_year) %>%
-#   select(c('variable','region'), everything())
-# 
-# region_transaction <- df %>%
-#   group_by(transactions_end_year, place_name) %>%
-#   summarise(
-#     mean = mean(transaction_value),
-#     sd = sd(transaction_value),
-#     n = n(),
-#     min = min(transaction_value),
-#     max = max(transaction_value)
-#   ) %>%
-#   mutate(variable = 'transaction') %>%
-#   rename(region = place_name, year = transactions_end_year) %>%
-#   select(c('variable','region'), everything()) %>%
-#   arrange(region)
-# 
-# region_total_disbursement <- df %>%
-#   group_by(transactions_end_year, place_name) %>%
-#   summarise(
-#     mean = mean(total_disbursements),
-#     sd = sd(total_disbursements),
-#     n = n(),
-#     min = min(total_disbursements),
-#     max = max(total_disbursements)
-#   ) %>%
-#   mutate(variable = 'total_disbursement') %>%
-#   rename(region = place_name, year = transactions_end_year) %>%
-#   select(c('variable','region'), everything()) %>%
-#   arrange(region)
-# 
-# region_even_disbursement <- df %>%
-#   group_by(transactions_end_year, place_name) %>%
-#   summarise(
-#     mean = mean(even_split_disbursements),
-#     sd = sd(even_split_disbursements),
-#     n = n(),
-#     min = min(even_split_disbursements),
-#     max = max(even_split_disbursements)
-#   ) %>%
-#   mutate(variable = 'even_split_disbursement') %>%
-#   rename(region = place_name, year = transactions_end_year) %>%
-#   select(c('variable','region'), everything()) %>%
-#   arrange(region)
-# 
-# df_stats <- bind_rows(all_transaction, all_total_disbursement, all_even_disbursement, region_transaction, region_total_disbursement, region_even_disbursement)
-# 
-# df_stats <- df_stats %>%
-#   arrange(variable)
-# 
-# write_csv(df_stats, '/Users/charleneramos/Documents/Git/econ250project/data/int/summary_stats_aid.csv')
-# 
-# df_sum_stat <- df_stats %>%
-#   mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
-#   mutate(year = as.numeric(gsub(',', '', year))) %>%
-#   filter(region == 'All') %>%
-#   kbl() %>%                       # <— kableExtra’s wrapper; detects format
-#   kable_styling(full_width = FALSE)
-# 
-# save_kable(df_sum_stat, '/Users/charleneramos/Documents/Git/econ250project/output/summary_stats_aid.html')
-# webshot('/Users/charleneramos/Documents/Git/econ250project/output/summary_stats_aid.html', '/Users/charleneramos/Documents/Git/econ250project/output/summary_stats_aid.png',
-#         selector = "table",      # crops tightly to the table
-#         zoom = 2,                # higher resolution
-#         vwidth = 2000,           # width of the browser window
-#         vheight = 3000           # height — increase if your table is tall
-# )
-# 
-# df_stat_mean <- df_stats %>%
-#   group_by(variable, region, year) %>%
-#   mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
-#   mutate(year = as.numeric(gsub(',', '', year))) %>%
-#   select(c('variable', 'region', 'year', 'mean', 'sd')) %>%
-#   filter(region == 'All') %>%
-#   mutate(
-#     # format each mean–sd pair as a string
-#     mean_sd = paste0(
-#       mean,
-#       "<br>(",
-#       sd,
-#       ")"
-#     )
-#   ) %>%
-#   select(variable, region, year, mean_sd) %>%
-#   pivot_wider(
-#     names_from  = year,
-#     values_from = mean_sd
-#   ) %>%
-#   select(c('variable', 'region', '2013', '2014', '2015', '2016', '2017')) %>%
-#   kbl(escape = FALSE, align = "lcccc", caption = "Mean (SD) by Year") %>%
-#   kable_styling(full_width = FALSE)
-# 
-# save_kable(df_stat_mean, '/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid.html')
-# webshot('/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid.html', '/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid.png',
-#         selector = "table",      # crops tightly to the table
-#         zoom = 2,                # higher resolution
-#         vwidth = 2000,           # width of the browser window
-#         vheight = 3000           # height — increase if your table is tall
-# )
-# 
-# 
-# df_stat_mean_region <- df_stats %>%
-#   group_by(region, year) %>%
-#   mutate(across(where(is.numeric), ~ format(.x, big.mark = ",", scientific = FALSE))) %>%
-#   mutate(year = as.numeric(gsub(',', '', year))) %>%
-#   filter(variable == 'even_split_disbursement') %>%
-#   select(c('region', 'year', 'mean', 'sd')) %>%
-#   mutate(
-#     # format each mean–sd pair as a string
-#     mean_sd = paste0(
-#       mean,
-#       "<br>(",
-#       sd,
-#       ")"
-#     )
-#   ) %>%
-#   select(region, year, mean_sd) %>%
-#   pivot_wider(
-#     names_from  = year,
-#     values_from = mean_sd
-#   ) %>%
-#   select(c('region', '2013', '2014', '2015', '2016', '2017')) %>%
-#   kbl(escape = FALSE, align = "lcccc", caption = "Mean (SD) by Year and Region") %>%
-#   kable_styling(full_width = FALSE)
-# 
-# save_kable(df_stat_mean_region, '/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid_region.html')
-# webshot('/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid_region.html', '/Users/charleneramos/Documents/Git/econ250project/output/summary_mean_aid_region.png',
-#         selector = "table",      # crops tightly to the table
-#         zoom = 2,                # higher resolution
-#         vwidth = 2000,           # width of the browser window
-#         vheight = 3000           # height — increase if your table is tall
-# )
+
+library(here)
+
+source(here("code", "aid.R"))
 
 ```
 
@@ -276,40 +84,40 @@ The project, locations, and transactions provided in the foreign aid dataset was
 \midrule
 \addlinespace
 \multicolumn{5}{l}{\textbf{International Aid}} \\
-\quad Total transaction amount & `r format(all_transaction$mean[all_transaction$year == 2014], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$mean[all_transaction$year == 2015], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$mean[all_transaction$year == 2016], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$mean[all_transaction$year == 2017], big.mark = ",", scientific = FALSE)`\\
+\quad Total transaction amount & `r format(round(all_transact$mean[all_transact$year == 2014]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_transact$mean[all_transact$year == 2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_transact$mean[all_transact$year == 2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_transact$mean[all_transact$year == 2017]), big.mark = ",", scientific = FALSE)`\\
 
-& (`r format(all_transaction$sd[all_transaction$year == 2014], big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_transaction$sd[all_transaction$year == 2015], big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_transaction$sd[all_transaction$year == 2016], big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_transaction$sd[all_transaction$year == 2017], big.mark = ",", scientific = FALSE)`)\\~\\
+& (`r format(round(all_transact$sd[all_transact$year == 2014]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_transact$sd[all_transact$year == 2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_transact$sd[all_transact$year == 2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_transact$sd[all_transact$year == 2017]), big.mark = ",", scientific = FALSE)`)\\~\\
 
-\quad Even-split disbursement & `r format(all_even_disbursement$mean[all_even_disbursement$year == 2014], big.mark = ",", scientific = FALSE)` 
-& `r format(all_even_disbursement$mean[all_even_disbursement$year == 2015], big.mark = ",", scientific = FALSE)` 
-& `r format(all_even_disbursement$mean[all_even_disbursement$year == 2016], big.mark = ",", scientific = FALSE)` 
-& `r format(all_even_disbursement$mean[all_even_disbursement$year == 2017], big.mark = ",", scientific = FALSE)`\\
+\quad Even-split disbursement & `r format(round(all_even_disburse$mean[all_even_disburse$year == 2014]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`\\
 
-& (`r format(all_even_disbursement$sd[all_even_disbursement$year == 2014], big.mark = ",", scientific = FALSE)`)  
-& (`r format(all_even_disbursement$sd[all_even_disbursement$year == 2015], big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_even_disbursement$sd[all_even_disbursement$year == 2016]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_even_disbursement$sd[all_even_disbursement$year == 2017], big.mark = ",", scientific = FALSE)`)\\~\\
+& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2014]), big.mark = ",", scientific = FALSE)`)  
+& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`)\\~\\
 
-\quad Total disbursement & `r format(all_total_disbursement$mean[all_total_disbursement$year == 2014], big.mark = ",", scientific = FALSE)` 
-& `r format(all_total_disbursement$mean[all_total_disbursement$year == 2015], big.mark = ",", scientific = FALSE)` 
-& `r format(all_total_disbursement$mean[all_total_disbursement$year == 2016], big.mark = ",", scientific = FALSE)` 
-& `r format(all_total_disbursement$mean[all_total_disbursement$year == 2017], big.mark = ",", scientific = FALSE)` \\
+\quad Total disbursement & `r format(round(all_disburse$mean[all_disburse$year == 2014]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_disburse$mean[all_disburse$year == 2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_disburse$mean[all_disburse$year == 2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(all_disburse$mean[all_disburse$year == 2017]), big.mark = ",", scientific = FALSE)` \\
 
-& (`r format(all_total_disbursement$sd[all_total_disbursement$year == 2014], big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_total_disbursement$sd[all_total_disbursement$year == 2015], big.mark = ",", scientific = FALSE)`) 
-& (`r format(all_total_disbursement$sd[all_total_disbursement$year == 2016], big.mark = ",", scientific = FALSE)`)
-& (`r format(all_total_disbursement$sd[all_total_disbursement$year == 2017], big.mark = ",", scientific = FALSE)`)\\
+& (`r format(round(all_disburse$sd[all_disburse$year == 2014]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_disburse$sd[all_disburse$year == 2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_disburse$sd[all_disburse$year == 2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(all_disburse$sd[all_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`)\\
 \midrule
-\quad N & `r format(all_transaction$n[all_transaction$year == 2014], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$n[all_transaction$year == 2015], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$n[all_transaction$year == 2016], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transaction$n[all_transaction$year == 2017], big.mark = ",", scientific = FALSE)`\\
+\quad N & `r format(all_transact$n[all_transact$year == 2014], big.mark = ",", scientific = FALSE)` 
+& `r format(all_transact$n[all_transact$year == 2015], big.mark = ",", scientific = FALSE)` 
+& `r format(all_transact$n[all_transact$year == 2016], big.mark = ",", scientific = FALSE)` 
+& `r format(all_transact$n[all_transact$year == 2017], big.mark = ",", scientific = FALSE)`\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}\small
