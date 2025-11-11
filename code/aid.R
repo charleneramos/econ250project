@@ -50,43 +50,43 @@ all_transact <- df_transact %>%
   rename(year = transactions_end_year) %>%
   select(c('variable','region'), everything())
   
-  top_donors <- df_transact %>%
-    group_by(donors) %>%
-    summarise(
-      transact_sum = sum(transaction_value, na.rm = TRUE),
-      transact_n = n(),
-      .groups = "drop"
-    ) %>%
-    arrange(desc(transact_sum)) %>%
-    mutate(
-      percent_transact_sum = transact_sum / sum(df_transact$transaction_value, na.rm = TRUE) * 100
-    ) %>%
-    select(donors, transact_sum, transact_n, percent_transact_sum)
+top_donors <- df_transact %>%
+  group_by(donors) %>%
+   summarise(
+    transact_sum = sum(transaction_value, na.rm = TRUE),
+    transact_n = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(transact_sum)) %>%
+  mutate(
+    percent_transact_sum = transact_sum / sum(df_transact$transaction_value, na.rm = TRUE) * 100
+  ) %>%
+  select(donors, transact_sum, transact_n, percent_transact_sum)
 
   # make a sensible total row: sum numeric totals, set percent to 100
-  total_row <- top_donors %>%
-    summarise(
-      donors = "Total",
-      transact_sum = sum(transact_sum, na.rm = TRUE),
-      transact_n = sum(transact_n, na.rm = TRUE),
-      percent_transact_sum = sum(percent_transact_sum)
-    )
+total_row <- top_donors %>%
+  summarise(
+    donors = "Total",
+    transact_sum = sum(transact_sum, na.rm = TRUE),
+    transact_n = sum(transact_n, na.rm = TRUE),
+    percent_transact_sum = sum(percent_transact_sum)
+  )
 
-  top_donors <- bind_rows(top_donors, total_row)
+top_donors <- bind_rows(top_donors, total_row)
 
   # create formatted display columns (keep numeric originals for calculations)
-  top_donors <- top_donors %>%
-    mutate(
-      transact_sum_f = format(round(transact_sum), big.mark = ",", scientific = FALSE),
-      transact_n_f = format(transact_n, big.mark = ",", scientific = FALSE),
-      percent_transact_sum_f = paste0(format(round(percent_transact_sum, 1), nsmall = 1, scientific = FALSE), "%")
-    ) %>%
+top_donors <- top_donors %>%
+  mutate(
+    transact_sum_f = format(round(transact_sum), big.mark = ",", scientific = FALSE),
+    transact_n_f = format(transact_n, big.mark = ",", scientific = FALSE),
+    percent_transact_sum_f = paste0(format(round(percent_transact_sum, 1), nsmall = 1, scientific = FALSE), "%")
+  ) %>%
   select(donors, transact_n_f, transact_sum_f, percent_transact_sum_f) %>%
   rename(Donor = donors,donors = donors,
          `# Transactions` = transact_n_f,
          `Total (USD)` = transact_sum_f,
          `Share (%)` = percent_transact_sum_f
-         )
+  )
 
 # all_transaction <- df %>% 
 #   group_by(transactions_end_year) %>%
@@ -199,13 +199,24 @@ df_stats <- bind_rows(all_transact, all_disburse, all_even_disburse)
 
 # df_stats <- bind_rows(all_transaction, all_total_disbursement, all_even_disbursement, region_transaction, region_total_disbursement, region_even_disbursement)
 
-df_stats <- df_stats %>% 
-  arrange(variable)
+# ---- create csv ----
+
+df <- df %>%
+  mutate(
+    log_total_commitments = log(if_else(total_commitments > 0, total_commitments, NA_real_)),
+    log_transaction_value = log(if_else(transaction_value > 0, transaction_value, NA_real_)),
+    log_total_disbursements = log(if_else(total_disbursements > 0, total_disbursements, NA_real_)),
+    log_even_split_disbursements = log(if_else(even_split_disbursements > 0, even_split_disbursements, NA_real_))
+  )
+
+write_csv(df, here("data", "final", "aid.csv"))
 
 
 
 # ---- create summary statistics ----
-write_csv(df, here("data", "final", "aid.csv"))
+df_stats <- df_stats %>% 
+  arrange(variable)
+
 write_csv(df_stats, here("data", "final", "summary_stats_aid.csv"))
 
 # df_sum_stat <- df_stats %>%
