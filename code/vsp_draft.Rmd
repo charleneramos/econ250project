@@ -44,9 +44,9 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 ```{r data_aid, include=FALSE}
 
-library(here)
-
-source(here("code", "aid.R"))
+# library(here)
+# 
+# source(here("code", "aid.R"))
 
 ```
 
@@ -58,13 +58,7 @@ source(here("code", "aid.R"))
 
 
 \section{Introduction}
-In this paper, we study the impact of foreign aid on the educational outcomes of working-age adults in Uganda. The relationship between the amount of aid received and the economic growth of developing countries remains an open, important question among researchers and policymakers. Using spatial data from William \& Mary’s GeoQuery platform, we trace the geographic boundaries of various projects and their reach during 2014 to 2017. This allows us to pursue identification through a Barthik instrument constructed with industry and employment shares by district. To formulate the second stage of the regression, we utilize data on educational attainment available at the smallest level of disaggregation for interpretation against the instrumental variable.
-
 \section{Data}
-The project, locations, and transactions provided in the foreign aid dataset was extracted using the GeoQuery platform, which was initially funded by USAID and continues to be managed by William \& Mary as an initiative under their development research lab called AidData. The combined dataset contains all geocoded projects from the Government of Uganda's Aid Information Management System (AIMS) (also known as Uganda's Aid Management Platform or UAMP). It follows 565 geocoded projects across 2,426 locations from as early as the late 1970s through the mid-2010s. In total, the database accounts for more than \$$7.5$ billion in disbursements. The scope of the projects span a wide range of targeted sectors such as health, energy, and education with additional detailed information on other relevant variables including donors, start date, end date, and total commitments. 
-
-\section{Methodology}
-\section{Results}
 
 \begin{table}[!htbp]
 \centering
@@ -84,40 +78,40 @@ The project, locations, and transactions provided in the foreign aid dataset was
 \midrule
 \addlinespace
 \multicolumn{5}{l}{\textbf{International Aid}} \\
-\quad Total transaction amount & `r format(round(all_transact$mean[all_transact$year == 2014]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_transact$mean[all_transact$year == 2015]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_transact$mean[all_transact$year == 2016]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_transact$mean[all_transact$year == 2017]), big.mark = ",", scientific = FALSE)`\\
+\quad Total transaction amount & NA
+& `r format(round(edu_stats$mean[edu_stats$variable == 'transaction' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'transaction' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'transaction' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)`\\
 
-& (`r format(round(all_transact$sd[all_transact$year == 2014]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_transact$sd[all_transact$year == 2015]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_transact$sd[all_transact$year == 2016]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_transact$sd[all_transact$year == 2017]), big.mark = ",", scientific = FALSE)`)\\~\\
+& 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'transaction' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'transaction' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'transaction' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)`)\\~\\
 
-\quad Even-split disbursement & `r format(round(all_even_disburse$mean[all_even_disburse$year == 2014]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2015]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2016]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_even_disburse$mean[all_even_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`\\
+\quad Even-split disbursement & NA 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)`\\
 
-& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2014]), big.mark = ",", scientific = FALSE)`)  
-& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2015]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2016]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_even_disburse$sd[all_even_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`)\\~\\
+&  
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'even_split_disbursement' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)`)\\~\\
 
-\quad Total disbursement & `r format(round(all_disburse$mean[all_disburse$year == 2014]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_disburse$mean[all_disburse$year == 2015]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_disburse$mean[all_disburse$year == 2016]), big.mark = ",", scientific = FALSE)` 
-& `r format(round(all_disburse$mean[all_disburse$year == 2017]), big.mark = ",", scientific = FALSE)` \\
+\quad Total disbursement & NA
+& `r format(round(edu_stats$mean[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)` 
+& `r format(round(edu_stats$mean[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)` \\
 
-& (`r format(round(all_disburse$sd[all_disburse$year == 2014]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_disburse$sd[all_disburse$year == 2015]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_disburse$sd[all_disburse$year == 2016]), big.mark = ",", scientific = FALSE)`) 
-& (`r format(round(all_disburse$sd[all_disburse$year == 2017]), big.mark = ",", scientific = FALSE)`)\\
+& 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2015]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2016]), big.mark = ",", scientific = FALSE)`) 
+& (`r format(round(edu_stats$sd[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2017]), big.mark = ",", scientific = FALSE)`)\\
 \midrule
-\quad N & `r format(all_transact$n[all_transact$year == 2014], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transact$n[all_transact$year == 2015], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transact$n[all_transact$year == 2016], big.mark = ",", scientific = FALSE)` 
-& `r format(all_transact$n[all_transact$year == 2017], big.mark = ",", scientific = FALSE)`\\
+\quad N & 0
+& `r format(edu_stats$n[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2015], big.mark = ",", scientific = FALSE)` 
+& `r format(edu_stats$n[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2016], big.mark = ",", scientific = FALSE)` 
+& `r format(edu_stats$n[edu_stats$variable == 'total_disbursement' & edu_stats$year ==2017], big.mark = ",", scientific = FALSE)`\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}\small
@@ -127,9 +121,55 @@ The project, locations, and transactions provided in the foreign aid dataset was
 \end{table}
 \FloatBarrier
 
+\section{Methodology}
+\section{Results}
+
+\begin{table}[htbp]
+\centering
+\caption{Estimated Effect of Aid on Educational Outcomes}
+\label{tab:aid_edu}
+\begin{threeparttable}
+\begin{tabular}{lcccccccc}
+\toprule
+                    & (1) L      & (2) L+C     & (3) L+C+FE    & (4) L+C+FE+YFE
+                    & (5) Q      & (6) Q+C     & (7) Q+C+FE    & (8) Q+C+FE+YFE \\
+\midrule
+$Aid_{i,t-1}$        & a1         & a2          & a3            & a4
+                     & b1         & b2          & b3            & b4 \\
+                     & (se1)      & (se2)       & (se3)         & (se4)
+                     & (se5)      & (se6)       & (se7)         & (se8) \\
+$Aid_{i,t-1}^2$      &            &             &               & 
+                     & c1         & c2          & c3            & c4 \\
+                     &            &             &               & 
+                     & (se9)      & (se10)      & (se11)        & (se12) \\
+\addlinespace
+Controls             & No         & Yes         & Yes           & Yes
+                     & No         & Yes         & Yes           & Yes \\
+FE (district)        & No         & No          & Yes           & Yes
+                     & No         & No          & Yes           & Yes \\
+FE (year)            & No         & No          & No            & Yes
+                     & No         & No          & No            & Yes \\
+Squared term incl.?  & No         & No          & No            & No
+                     & Yes        & Yes         & Yes           & Yes \\
+\midrule
+Observations         & …          & …           & …             & …
+                     & …          & …           & …             & … \\
+$R^{2}$              & …          & …           & …             & …
+                     & …          & …           & …             & … \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+Notes: Standard errors (in parentheses) clustered at the district level.
+L = linear; Q = quadratic; C = controls; FE = fixed effects; YFE = year fixed effects.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\FloatBarrier
+
 \section{Discussion}
 \section{Conclusion}
-\section{References}
 
 
 
