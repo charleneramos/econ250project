@@ -1,0 +1,209 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{lmodern}
+\usepackage{placeins}
+\usepackage{setspace}
+\usepackage{threeparttable}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % clear default header/footer
+\cfoot{\thepage} % page number on bottom-right
+\renewcommand{\headrulewidth}{0pt}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Does Foreign Aid Improve Educational Outcomes? Evidence from Uganda},
+  pdfauthor={Riana Ramonjamanana; Charlene R. Ramos},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Does Foreign Aid Improve Educational Outcomes? Evidence from
+Uganda}
+\author{Riana Ramonjamanana \and Charlene R. Ramos}
+\date{2025-11-12}
+
+\begin{document}
+\maketitle
+
+
+
+
+\section{Introduction}
+\section{Data}
+
+\begin{table}[!htbp]
+\centering
+\caption{Summary Statistics by Year}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+\toprule
+\multicolumn{1}{l}{} & \textbf{2014} & \textbf{2015} & \textbf{2016} & \textbf{2017} \\
+\midrule
+\multicolumn{5}{l}{\textbf{Education Outcomes}} \\
+\quad Primary gross enrollment rate & 125.09 & 111.10 & 128.81 & 115.44 \\
+& (43.34) & (26.91) & (66.62) & (30.33) \\~\\
+\quad Secondary gross enrollment rate & 29.62 & 23.61 & 28.64 & 24.29 \\
+& (15.89) & (13.49) & (19.20) & (12.41)\\
+\midrule
+\quad N & 123 & 123 & 123 & 123 \\
+\midrule
+\addlinespace
+\multicolumn{5}{l}{\textbf{International Aid}} \\
+\quad Total transaction amount & NA
+& 221,755 
+& 223,778 
+& 162,984\\
+
+& 
+& (49,162) 
+& (17,249) 
+& (79,449)\\~\\
+
+\quad Even-split disbursement & NA 
+& 179,222 
+& 178,038 
+& 86,468\\
+
+&  
+& (83,186) 
+& (144,796) 
+& (45,896)\\~\\
+
+\quad Total disbursement & NA
+& 681,808 
+& 434,891 
+& 293,221 \\
+
+& 
+& (115,395) 
+& (207,273) 
+& (119,302)\\
+\midrule
+\quad N & 0
+& 68 
+& 12 
+& 21\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}\small
+\item Notes: Values are means with standard deviations in parentheses. Aid data are from Uganda's Aid Management Platform that tracks geocoded projects' disbursements. Even-split disbursement represent evenly allocated total disbursement amounts between project start and end years. Education data are from the Uganda Bureau of Statistics.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+\FloatBarrier
+
+\section{Methodology}
+\section{Results}
+
+\begin{table}[htbp]
+\centering
+\caption{Estimated Effect of Aid on Educational Outcomes}
+\label{tab:aid_edu}
+\begin{threeparttable}
+\begin{tabular}{lcccccccc}
+\toprule
+                    & (1) L      & (2) L+C     & (3) L+C+FE    & (4) L+C+FE+YFE
+                    & (5) Q      & (6) Q+C     & (7) Q+C+FE    & (8) Q+C+FE+YFE \\
+\midrule
+$Aid_{i,t-1}$        & a1         & a2          & a3            & a4
+                     & b1         & b2          & b3            & b4 \\
+                     & (se1)      & (se2)       & (se3)         & (se4)
+                     & (se5)      & (se6)       & (se7)         & (se8) \\
+$Aid_{i,t-1}^2$      &            &             &               & 
+                     & c1         & c2          & c3            & c4 \\
+                     &            &             &               & 
+                     & (se9)      & (se10)      & (se11)        & (se12) \\
+\addlinespace
+Controls             & No         & Yes         & Yes           & Yes
+                     & No         & Yes         & Yes           & Yes \\
+FE (district)        & No         & No          & Yes           & Yes
+                     & No         & No          & Yes           & Yes \\
+FE (year)            & No         & No          & No            & Yes
+                     & No         & No          & No            & Yes \\
+Squared term incl.?  & No         & No          & No            & No
+                     & Yes        & Yes         & Yes           & Yes \\
+\midrule
+Observations         & …          & …           & …             & …
+                     & …          & …           & …             & … \\
+$R^{2}$              & …          & …           & …             & …
+                     & …          & …           & …             & … \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+Notes: Standard errors (in parentheses) clustered at the district level.
+L = linear; Q = quadratic; C = controls; FE = fixed effects; YFE = year fixed effects.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\FloatBarrier
+
+\section{Discussion}
+\section{Conclusion}
+
+
+
+
+\end{document}
